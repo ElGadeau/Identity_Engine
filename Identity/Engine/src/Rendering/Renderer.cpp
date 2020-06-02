@@ -12,7 +12,7 @@
 
 using namespace Engine::Rendering;
 
-constexpr bool V_SYNC = true;
+constexpr bool V_SYNC = false;
 
 std::unique_ptr<Renderer> Renderer::instance;
 Renderer::Renderer(const HWND& p_hwnd, const int& p_clientWidth, const int& p_clientHeight) :

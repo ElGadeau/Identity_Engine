@@ -220,11 +220,6 @@ void Engine::Components::BoxCollider::Deserialize(Objects::GameObject* p_gameObj
         words.clear();
     }
 
-    //TODO: Memory leak here
-    /*delete m_box;
-    delete m_rigidbody;
-    delete m_motionState;*/
-
     btVector3 localInertia(0.0f, 0.0f, 0.0f);
     btTransform trans;
     auto position = m_gameObject->GetTransform()->GetPosition();
@@ -262,7 +257,6 @@ void Engine::Components::BoxCollider::SetPositionOffset(GPM::Vector3F p_offset)
     m_offset = p_offset;
 
     btVector3 localInertia = m_rigidbody->getLocalInertia();
-    // btVector3 localInertia(0.0f, 0.0f, 0.0f);
     btTransform trans;
     auto position = m_gameObject->GetTransform()->GetPosition();
     auto rotation = m_gameObject->GetTransform()->GetRotation();

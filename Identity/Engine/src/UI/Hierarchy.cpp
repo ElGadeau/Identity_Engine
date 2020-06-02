@@ -41,7 +41,7 @@ std::shared_ptr<Engine::Scene::SceneNode> Engine::UI::Hierarchy::DisplayNextChil
 
             if (ImGui::IsItemClicked())
                 m_currentlySelected = p_child->GetID();
-            else if (ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered())
+            else if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && !ImGui::IsAnyItemHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow))
             {
                 m_currentlySelected = -1;
                 selection_mask = false;
@@ -68,17 +68,10 @@ std::shared_ptr<Engine::Scene::SceneNode> Engine::UI::Hierarchy::DisplayNextChil
 
         if (ImGui::IsItemClicked())
             m_currentlySelected = p_child->GetID();
-        else if (ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered())
+        else if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && !ImGui::IsAnyItemHovered() && ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow))
         {
             m_currentlySelected = -1;
             selection_mask = false;
-        }
-
-        if (test_drag_and_drop && ImGui::BeginDragDropSource())
-        {
-            ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
-            ImGui::Text("%s", p_child->GetName().c_str());
-            ImGui::EndDragDropSource();
         }
     }
     if (m_currentlySelected != -1)
@@ -109,6 +102,7 @@ void Engine::UI::Hierarchy::CreateHierarchy(Core::App& p_appRef)
 
 void Engine::UI::Hierarchy::ShowMenu()
 {
+
     if (m_currentlySelected > 0)
     {
         if (ImGui::BeginPopupContextWindow("Hierarchy Menu"))
@@ -191,9 +185,9 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
     }
 
     ImGui::InputText(" ", buf1, 64);
-    ImGui::SameLine();
 
-    gameObject->SetName(buf1);
+    if (ImGui::IsItemEdited())
+        gameObject->SetName(buf1);
 
     if (gameObject->GetSceneNode())
         gameObject->GetSceneNode()->SetName(buf1);
@@ -202,6 +196,7 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
 
     bool active = gameObject->IsActive();
 
+    ImGui::SameLine();
     if (ImGui::Checkbox("Active", &active))
     {
         gameObject->SetActive(active);
@@ -214,14 +209,19 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                                        static_cast<float>(rotationQuaternion.ToEuler().y),
                                        static_cast<float>(rotationQuaternion.ToEuler().z)
     };
-    if (ImGui::CollapsingHeader("Transform"))
+    if (ImGui::CollapsingHeader("Transform"), ImGuiTreeNodeFlags_DefaultOpen)
     {
+        ImGui::Dummy(ImVec2(0.0f, 2.0f));
         float* pos[3] = { &transform->GetPosition().x, &transform->GetPosition().y, &transform->GetPosition().z };
         float* rot[3] = { &rotationEuler.x, &rotationEuler.y, &rotationEuler.z };
         float* scale[3] = { &transform->GetScale().x, &transform->GetScale().y, &transform->GetScale().z };
-        ImGui::DragFloat3("Position", *pos, 0.1f, 0, 0, "%0.2f");
-        ImGui::DragFloat3("Rotation", *rot, 0.1f, 0, 0, "%0.2f");
-        ImGui::DragFloat3("Scale", *scale, 0.1f, 0, 0, "%0.2f");
+        if (ImGui::DragFloat3("Position", *pos, 0.1f, 0, 0, "%0.2f"))
+            transform->needUpdate = true;
+        if (ImGui::DragFloat3("Rotation", *rot, 0.1f, 0, 0, "%0.2f"))
+            transform->needAxesUpdate = true;
+        if (ImGui::DragFloat3("Scale", *scale, 0.1f, 0, 0, "%0.2f"))
+            transform->needUpdate = true;
+        ImGui::Dummy(ImVec2(0.0f, 5.0f));
     }
 
     if (rotationEuler.y > 90.0f || rotationEuler.y < -90.0f)
@@ -229,8 +229,6 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
 
     rotationQuaternion.MakeFromEuler(rotationEuler);
 
-    transform->needUpdate = true;
-    transform->needAxesUpdate = true;
 
 
     for (auto component : gameObject->GetAllComponents())
@@ -244,8 +242,10 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
         {
             std::shared_ptr<Components::ModelComponent> modelComponent = std::dynamic_pointer_cast<Components::ModelComponent>(Icomponent);
 
-            if (ImGui::CollapsingHeader("Model Component"))
+            if (ImGui::CollapsingHeader("Model Component", ImGuiTreeNodeFlags_DefaultOpen))
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
                 bool compActive = Icomponent->IsActive();
                 if (ImGui::Checkbox("Active##1", &compActive))
                 {
@@ -272,7 +272,7 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                         if (ImGui::Button(model->GetName().c_str()))
                         {
                             modelComponent->SetModel(model->GetID());
-                            for (auto go : Managers::SceneManager::GetActiveScene()->GetSceneGraph().GetRootSceneNodes())
+                            for (auto& go : Managers::SceneManager::GetActiveScene()->GetSceneGraph().GetRootSceneNodes())
                                 if (go.second->GetGameObject() == gameObject)
                                     go.second->SetModel(model);
 
@@ -293,15 +293,20 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                     ImGui::OpenPopup("Select Mesh");
                 }
 
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 if (ImGui::Button("Remove Component##1"))
                 {
                     gameObject->RemoveComponent(modelComponent->GetID());
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
+
             }
 #pragma endregion
 #pragma region Material
-            if (ImGui::CollapsingHeader("Material"))
+                //todo fix change material button being too low (bug, probably due to names)
+            if (ImGui::CollapsingHeader("Material"), ImGuiTreeNodeFlags_DefaultOpen)
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 std::shared_ptr<Rendering::Materials::Material> mat = modelComponent->GetMaterial();
 
                 if (ImGui::BeginPopup("Select Material"))
@@ -324,25 +329,34 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                     ImGui::EndPopup();
                 }
 
-                if (ImGui::Button("Change Material"))
-                {
-                    ImGui::OpenPopup("Select Material");
-                }
-
                 if (mat == nullptr)
                     break;
 
                 if (mat->GetName()._Equal("default"))
                 {
                     ImGui::TextWrapped("Using default material. Please add a new material to edit it.");
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                    if (ImGui::Button("Change Material##1"))
+                    {
+                        ImGui::OpenPopup("Select Material");
+                    }
                     break;
                 }
+                
                 float* objectColor[3] = { &mat->GetColor().x, &mat->GetColor().y, &mat->GetColor().z };
-                ImGui::ColorEdit3("Light Color", *objectColor, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+                ImGui::ColorEdit3("Material Color", *objectColor, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs);
                 if (mat->GetTextureState() == true)
                 {
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
                     ImGui::Text("Texture");
                     ImGui::Image(*mat->GetTexture()->GetTextureShaderResourceView().GetAddressOf(), ImVec2(100, 100));
+                    ImGui::Text("%s", mat->GetTexture()->GetName().c_str());
+                    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+                }
+
+                if (ImGui::Button("Change Material##2"))
+                {
+                    ImGui::OpenPopup("Select Material");
                 }
 
                 if (ImGui::BeginPopup("Select Texture"))
@@ -372,6 +386,7 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                 {
                     ImGui::OpenPopup("Select Texture");
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
             break;
 #pragma endregion
@@ -379,8 +394,9 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
         case Components::BOX_COLLIDER:
         {
             std::shared_ptr<Components::BoxCollider> boxCollider = std::dynamic_pointer_cast<Components::BoxCollider>(Icomponent);
-            if (ImGui::CollapsingHeader("Box Collider"))
+            if (ImGui::CollapsingHeader("Box Collider"), ImGuiTreeNodeFlags_DefaultOpen)
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 bool compActive = Icomponent->IsActive();
                 if (ImGui::Checkbox("Active##2", &compActive))
                 {
@@ -392,26 +408,29 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                 float* offset[3] = { &boxCollider->GetOffset().x, &boxCollider->GetOffset().y, &boxCollider->GetOffset().z };
                 float* mass = { &boxCollider->GetMass() };
 
-                ImGui::DragFloat3("Dimensions", *dimensions, 0.1f, 0, 0, "%0.2f");
-                ImGui::DragFloat("Mass", mass, 0.1f, 0, 0, "%0.2f");
-                ImGui::DragFloat3("Offset", *offset, 0.1f, 0, 0, "%0.2f");
+                if (ImGui::DragFloat3("Dimensions", *dimensions, 0.1f, 0, 0, "%0.2f"))
+                    boxCollider->SetDimensions(boxCollider->GetDimensions());
+                if (ImGui::DragFloat("Mass", mass, 0.1f, 0, 0, "%0.2f"))
+                    boxCollider->SetMass(boxCollider->GetMass());
+                if (ImGui::DragFloat3("Offset", *offset, 0.1f, 0, 0, "%0.2f"))
+                    boxCollider->SetPositionOffset(boxCollider->GetOffset());
 
-                boxCollider->SetPositionOffset(boxCollider->GetOffset());
-                boxCollider->SetMass(boxCollider->GetMass());
-                boxCollider->SetDimensions(boxCollider->GetDimensions());
 
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 if (ImGui::Button("Remove Component##2"))
                 {
                     gameObject->RemoveComponent(boxCollider->GetID());
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
             break;
         }
         case Components::SPHERE_COLLIDER:
         {
             std::shared_ptr<Components::SphereCollider> sphereCollider = std::dynamic_pointer_cast<Components::SphereCollider>(Icomponent);
-            if (ImGui::CollapsingHeader("Sphere Collider"))
+            if (ImGui::CollapsingHeader("Sphere Collider"), ImGuiTreeNodeFlags_DefaultOpen)
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 bool compActive = Icomponent->IsActive();
                 if (ImGui::Checkbox("Active##3", &compActive))
                 {
@@ -423,28 +442,29 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                 float* offset[3] = { &sphereCollider->GetOffset().x, &sphereCollider->GetOffset().y, &sphereCollider->GetOffset().z };
                 float* mass = { &sphereCollider->GetMass() };
 
-                ImGui::DragFloat("Radius", radius, 0.1f, 0, 0, "%0.2f");
-                ImGui::DragFloat("Mass", mass, 0.1f, 0, 0, "%0.2f");
-                ImGui::DragFloat3("Offset", *offset, 0.1f, 0, 0, "%0.2f");
+                if (ImGui::DragFloat("Radius", radius, 0.1f, 0, 0, "%0.2f"))
+                    sphereCollider->SetRadius(sphereCollider->GetRadius());
+                if (ImGui::DragFloat("Mass", mass, 0.1f, 0, 0, "%0.2f"))
+                    sphereCollider->SetMass(sphereCollider->GetMass());
+                if (ImGui::DragFloat3("Offset", *offset, 0.1f, 0, 0, "%0.2f"))
+                    sphereCollider->SetPositionOffset(sphereCollider->GetOffset());
 
-                sphereCollider->SetPositionOffset(sphereCollider->GetOffset());
-                sphereCollider->SetMass(sphereCollider->GetMass());
-                sphereCollider->SetRadius(sphereCollider->GetRadius());
 
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 if (ImGui::Button("Remove Component##3"))
                 {
                     gameObject->RemoveComponent(sphereCollider->GetID());
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
-
-
             break;
         }
         case Components::CAMERA:
         {
             std::shared_ptr<Components::Camera> camera = std::dynamic_pointer_cast<Components::Camera>(Icomponent);
-            if (ImGui::CollapsingHeader("Camera"))
+            if (ImGui::CollapsingHeader("Camera"), ImGuiTreeNodeFlags_DefaultOpen)
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 bool compActive = Icomponent->IsActive();
                 if (ImGui::Checkbox("Active##4", &compActive))
                 {
@@ -455,11 +475,15 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
 
                 ImGui::SliderFloat("Camera FOV", &fov, 10.f, 180.f, "%0.f");
 
-                camera->SetFOV(fov);
+                if (ImGui::IsItemEdited())
+                    camera->SetFOV(fov);
+
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 if (ImGui::Button("Remove Component##4"))
                 {
                     gameObject->RemoveComponent(camera->GetID());
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
             break;
         }
@@ -468,8 +492,9 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
             std::shared_ptr<Components::Light> lightComp = std::dynamic_pointer_cast<Components::Light>(Icomponent);
             std::shared_ptr<Rendering::Lights::ILight> ILight = lightComp->GetLight();
             Rendering::Lights::ILight::LightData& lightData = ILight->GetLightData();
-            if (ImGui::CollapsingHeader("Light"))
+            if (ImGui::CollapsingHeader("Light"), ImGuiTreeNodeFlags_DefaultOpen)
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 bool compActive = Icomponent->IsActive();
                 if (ImGui::Checkbox("Active##5", &compActive))
                 {
@@ -493,12 +518,13 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                 ImGui::SliderFloat("Shininess", shininess, 8.0f, 512.0f, "%.0f");
                 ImGui::SliderFloat("Range", range, 0.00f, 5.0f, "%.2f");
 
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 if (ImGui::Button("Remove Component##5"))
                 {
                     gameObject->RemoveComponent(lightComp ->GetID());
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
-
             break;
         }
         case Components::SOUND:
@@ -506,8 +532,9 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
             static bool chooseSound = false;
 
             std::shared_ptr<Components::Sound> sound = std::dynamic_pointer_cast<Components::Sound>(Icomponent);
-            if (ImGui::CollapsingHeader("Sound"))
+            if (ImGui::CollapsingHeader("Sound"), ImGuiTreeNodeFlags_DefaultOpen)
             {
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 bool compActive = Icomponent->IsActive();
                 if (ImGui::Checkbox("Active##4", &compActive))
                 {
@@ -568,12 +595,13 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
                     chooseSound = false;
                 }
 
+                ImGui::Dummy(ImVec2(0.0f, 2.0f));
                 if (ImGui::Button("Remove Component##6"))
                 {
                     gameObject->RemoveComponent(sound->GetID());
                 }
+                ImGui::Dummy(ImVec2(0.0f, 5.0f));
             }
-
             break;
         }
         case Components::UNSET:
@@ -599,7 +627,6 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
         {
             if (ImGui::Button(types[i].c_str(), ImVec2(200, 20)))
             {
-                auto gameObject = Managers::SceneManager::GetActiveScene()->GetSceneGraph().GetAllSceneNodes().find(p_id)->second->GetGameObject();
                 const Vector2F size(1920, 1080);
                 switch (i)
                 {

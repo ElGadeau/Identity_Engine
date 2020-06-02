@@ -93,9 +93,8 @@ int Engine::Core::App::Run()
             Systems::SoundSystem::Update(deltaTime);
 
         fixedUpdateTimer += deltaTime;
-        //todo this should never go below 0
-        //update could be at 0.01f
-        if (fixedUpdateTimer >= 0.01f)// || fixedUpdateTimer < 0)
+
+        if (fixedUpdateTimer >= 0.016f)
         {
             if (RunBullet)
                 Systems::PhysicsSystem::FixedUpdate();

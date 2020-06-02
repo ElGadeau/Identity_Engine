@@ -13,6 +13,8 @@
 #include <Objects/GameObject.h>
 #include <Scene/Scene.h>
 
+#include "Tools/Time.h"
+
 void Engine::UI::Dockspace::CreateDockspace(Core::App& p_appRef)
 {
     static bool               opt_fullscreen_persistant = true;
@@ -174,6 +176,8 @@ void Engine::UI::Dockspace::CreateMenuBar(Core::App& p_appRef)
             p_appRef.TestingSimulation();
         }
 
+        //std::string()
+        ImGui::Text("FPS: %d", Tools::Time::GetFPS());
         ImGui::SetCursorPosX(Rendering::Renderer::GetInstance()->GetWidth() * 0.955f);
         if (ImGui::Button("Debug Mode"))
         {
@@ -320,7 +324,7 @@ void Engine::UI::Dockspace::CreateMenuBar(Core::App& p_appRef)
     }
     if (showColor)
     {
-        if (ImGui::Begin("Ambient Color", &showColor, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::Begin("Ambient Light Settings", &showColor, ImGuiWindowFlags_NoCollapse))
         {
             float* ambient[4] = {
             &Systems::RenderSystem::GetInstance()->m_ambientColor.x,
@@ -328,7 +332,7 @@ void Engine::UI::Dockspace::CreateMenuBar(Core::App& p_appRef)
             &Systems::RenderSystem::GetInstance()->m_ambientColor.z,
             &Systems::RenderSystem::GetInstance()->m_ambientColor.w,
             };
-            ImGui::ColorEdit4("Ambient Color", *ambient, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar);
+            ImGui::ColorEdit4("Ambient Color & Intensity", *ambient, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaBar);
             ImGui::End();
         }
     }

@@ -9,14 +9,14 @@ namespace Engine::Rendering::Lights
     public:
         struct LightData
         {
-            Vector4F position;
-            Vector4F ambient;
-            Vector4F diffuse;
-            Vector4F specular;
-            float shininess;
-            float range;
-            float intensity;
-            float set;
+            Vector4F position{ 0.0f,0.0f,0.0f,0.0f};
+            Vector4F ambient{ 0.1f,0.1f,0.1f,0.1f };
+            Vector4F diffuse{ 1.0f,1.0f,1.0f,0.1f };
+            Vector4F specular{ 1.0f,1.0f,1.0f,0.1f };
+            float shininess{8.0f};
+            float range{20.0f};
+            float intensity{1.0f};
+            float set{0.0f};
         };
         ILight(LightData p_lightData) : m_lightData{ p_lightData }{}
 

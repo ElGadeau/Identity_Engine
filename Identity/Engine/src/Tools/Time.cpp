@@ -12,13 +12,15 @@ Time::Time(int p_numberOfSamples = 10) : m_numberOfSamples{p_numberOfSamples}
 
 void Time::Start()
 {
-    GetInstance()->m_startTime = std::chrono::high_resolution_clock::now();
+    GetInstance()->m_startTime = std::chrono::system_clock::now();
 }
 
 void Time::Stop()
 {
-    GetInstance()->m_updateFrameTime = std::chrono::high_resolution_clock::now();
-    GetInstance()->m_deltaTime       = std::chrono::duration_cast<std::chrono::milliseconds>(GetInstance()->m_endTime - GetInstance()->m_startTime).count();
+
+    GetInstance()->m_updateFrameTime = std::chrono::system_clock::now();
+    
+
     GetInstance()->m_previousTimes.push_back(GetInstance()->m_deltaTime);
 
     if (GetInstance()->m_previousTimes.size() > GetInstance()->m_numberOfSamples)
@@ -26,15 +28,14 @@ void Time::Stop()
         GetInstance()->m_previousTimes.pop_front();
     }
 
-    GetInstance()->m_updateFrameTime        = std::chrono::high_resolution_clock::now();
-    const std::chrono::duration<float> time = GetInstance()->m_updateFrameTime - GetInstance()->m_lastUpdateFrameTime;
+    const std::chrono::duration<double> timeStamp = GetInstance()->m_updateFrameTime - GetInstance()->m_lastUpdateFrameTime;
 
 
-    if (time.count() >= 1)
+    if (timeStamp.count() >= 1)
     {
-        GetInstance()->m_lastUpdateFrameTime = std::chrono::high_resolution_clock::now();
+        GetInstance()->m_lastUpdateFrameTime = std::chrono::system_clock::now();
 
-        float totalTime = 0.0f;
+        double totalTime = 0.0;
 
         for (auto time : GetInstance()->m_previousTimes)
         {
@@ -43,33 +44,22 @@ void Time::Stop()
 
         GetInstance()->m_FPS = totalTime / GetInstance()->m_previousTimes.size();
     }
-    GetInstance()->m_endTime = std::chrono::high_resolution_clock::now();
+    GetInstance()->m_endTime = std::chrono::system_clock::now();
+    GetInstance()->m_deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(GetInstance()->m_endTime - GetInstance()->m_startTime).count() * 0.001;
 }
 
 void Time::Update()
 {
-    /* GetInstance()->m_fixedUpdateCounter += GetInstance()->m_deltaTime;
- 
-     if (GetInstance()->m_fixedUpdateCounter >= 1.0f)
-     {
-         GetInstance()->m_fixedUpdateCounter = 0.0f;
-         Containers::EventContainer::GetEvent("CallFixedUpdate").Fire();
-     }*/
 }
 
 int Time::GetFPS()
 {
-    float fps = 1.0f / GetInstance()->m_FPS * 1000.0f;
-
-    return fps;
+    return static_cast<int>(1.0 / GetInstance()->m_FPS);
 }
 
-float Time::GetDeltaTime()
+double Time::GetDeltaTime()
 {
-    float deltaTime = GetInstance()->m_deltaTime;
-
-    if (1.0f / deltaTime > GetInstance()->m_fpsLimiter)
-        deltaTime = 1.0f / GetInstance()->m_fpsLimiter;
+    double deltaTime = GetInstance()->m_deltaTime;
 
     if (deltaTime < 0)
         return 0;

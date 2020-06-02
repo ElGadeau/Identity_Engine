@@ -25,9 +25,9 @@ namespace Engine::Tools
         /***
          * @return Time taken to finish a frame, in milliseconds.
          */
-        static float GetDeltaTime();
-        static float GetFixedUpdateCounter() { return GetInstance()->m_fixedUpdateCounter; }
-        static void SetFixedUpdateCounter(float p_counter) { GetInstance()->m_fixedUpdateCounter = p_counter; }
+        static double GetDeltaTime();
+        static double GetFixedUpdateCounter() { return GetInstance()->m_fixedUpdateCounter; }
+        static void SetFixedUpdateCounter(double p_counter) { GetInstance()->m_fixedUpdateCounter = p_counter; }
         //static std::chrono::time_point<std::chrono::system_clock>& GetFixedUpdate() { return GetInstance()->m_fixedUpdate; }
         static std::unique_ptr<Time>& GetInstance();
     	
@@ -35,17 +35,17 @@ namespace Engine::Tools
         static inline std::unique_ptr<Time> m_instance{ nullptr };
     	
         int m_numberOfSamples;
-        float m_deltaTime = 0.0f;
-        float m_FPS;
-        float m_fpsLimiter = 125.0f;
-        float m_fixedUpdateCounter = 0.0f;
+        double m_deltaTime = 0.0;
+        double m_FPS;
+        double m_fpsLimiter = 125.0f;
+        double m_fixedUpdateCounter = 0.0f;
     	
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;
+        std::chrono::time_point<std::chrono::system_clock> m_startTime;
+        std::chrono::time_point<std::chrono::system_clock> m_endTime;
 
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_updateFrameTime;
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_lastUpdateFrameTime;
+        std::chrono::time_point<std::chrono::system_clock> m_updateFrameTime;
+        std::chrono::time_point<std::chrono::system_clock> m_lastUpdateFrameTime;
     	
-        std::deque<float> m_previousTimes;
+        std::deque<double> m_previousTimes;
     };
 }

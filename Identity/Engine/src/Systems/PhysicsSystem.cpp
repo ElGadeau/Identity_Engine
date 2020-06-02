@@ -99,7 +99,7 @@ void Engine::Systems::PhysicsSystem::FixedUpdate()
     }
 
     //Bullet simulate physics
-    GetInstance()->m_dynamicsWorld->stepSimulation(1.0f / 60.0f, 0);
+    GetInstance()->m_dynamicsWorld->stepSimulation(0.016, 0);
 
     //Update collider positions
     for (auto& collider : GetInstance()->m_colliders)

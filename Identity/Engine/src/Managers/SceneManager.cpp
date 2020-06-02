@@ -193,7 +193,7 @@ void Engine::Managers::SceneManager::DuplicateScene(std::shared_ptr<Scene::Scene
 bool Engine::Managers::SceneManager::DeletePlaySceneNS()
 {
     int id = -1;
-    /*for (int i = 0; i < m_scenes.size(); ++i)
+    for (int i = 0; i < m_scenes.size(); ++i)
     {
         if (m_scenes[i] == m_playScene)
             id = i;
@@ -202,7 +202,7 @@ bool Engine::Managers::SceneManager::DeletePlaySceneNS()
     if (id < 0)
         return false;
 
-    m_scenes[id]->ClearScene();*/
+    m_scenes[id]->ClearScene();
     m_playScene->ClearScene();
     return true;
 }
