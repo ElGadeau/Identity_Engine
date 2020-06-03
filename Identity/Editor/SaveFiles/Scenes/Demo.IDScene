@@ -653,13 +653,13 @@ m_isActive 1
 class Engine::Components::Transform
 {
    m_parent -1
-   m_position 13.9 2.5 14.3
+   m_position -11.5 2.5 5
    m_forward -0 -0 1
    m_right 1 0 0
    m_up 0 -1 0
    m_scale 0.2 0.2 0.2
    m_rotation 0 0 0 1
-   m_worldTransform 0.2 0 0 13.9 0 0.2 0 2.5 0 0 0.2 14.3 0 0 0 1
+   m_worldTransform 0.2 0 0 -11.5 0 0.2 0 2.5 0 0 0.2 5 0 0 0 1
    m_localTransform 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 }
 class Engine::Rendering::Lights::DirectionalLight
@@ -670,7 +670,7 @@ class Engine::Rendering::Lights::DirectionalLight
        range 1.47
        intensity 20
        padding 0
-       position 13.9 2.5 14.3 1
+       position -11.5 2.5 5 1
        ambient 1 1 1 0
        diffuse 1 1 1 1
        specular 1 0.9999 0.9999 1
@@ -830,13 +830,13 @@ m_isActive 1
 class Engine::Components::Transform
 {
    m_parent -1
-   m_position 30.5 6 6.7
+   m_position 10.5 6 6.7
    m_forward -1 -0 0
    m_right 0 0 1
    m_up 0 -1 0
    m_scale 10 10 1
    m_rotation 0 0.707107 0 0.707107
-   m_worldTransform 0 0 1 30.5 0 10 0 6 -10 0 0 6.7 0 0 0 1
+   m_worldTransform 0 0 1 10.5 0 10 0 6 -10 0 0 6.7 0 0 0 1
    m_localTransform 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 }
 class Engine::Components::ModelComponent
@@ -861,13 +861,13 @@ m_isActive 1
 class Engine::Components::Transform
 {
    m_parent -1
-   m_position -2.8 6.1 15.4
+   m_position -3.3 6.1 6.8
    m_forward -0 -0 1
    m_right 1 0 0
    m_up 0 -1 0
    m_scale 12 10 1
    m_rotation 0 0 0 1
-   m_worldTransform 12 0 0 -2.8 0 10 0 6.1 0 0 1 15.4 0 0 0 1
+   m_worldTransform 12 0 0 -3.3 0 10 0 6.1 0 0 1 6.8 0 0 0 1
    m_localTransform 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 }
 class Engine::Components::ModelComponent
@@ -1162,13 +1162,13 @@ m_isActive 1
 class Engine::Components::Transform
 {
    m_parent -1
-   m_position 12.5 -1.8 13
+   m_position -12.5 -1.8 4
    m_forward -0 -0 1
    m_right 1 0 0
    m_up 0 -1 0
    m_scale 6 6 6
    m_rotation 0 0 0 1
-   m_worldTransform 6 0 0 12.5 0 6 0 -1.8 0 0 6 13 0 0 0 1
+   m_worldTransform 6 0 0 -12.5 0 6 0 -1.8 0 0 6 4 0 0 0 1
    m_localTransform 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 }
 class Engine::Components::ModelComponent
@@ -1228,7 +1228,7 @@ class Engine::Components::Transform
    m_position 5.3 17.9 1.2
    m_forward 1 -2.44929e-16 7.4988e-33
    m_right 7.4988e-33 -0 -1
-   m_up -2.44929e-16 -1 0
+   m_up -2.4493e-16 -1 0
    m_scale 0.1 0.1 0.1
    m_rotation 8.65956e-17 0.707107 8.65956e-17 -0.707107
    m_worldTransform 0 2.44929e-17 -0.1 5.3 0 0.1 2.44929e-17 17.9 0.1 0 0 1.2 0 0 0 1
@@ -1293,13 +1293,13 @@ m_isActive 1
 class Engine::Components::Transform
 {
    m_parent -1
-   m_position 24.6 -4 -9.5
-   m_forward 0.707106 -0 0.707108
-   m_right 0.707108 -0 -0.707107
-   m_up -0 -1 0
+   m_position 3.1 -4 0
+   m_forward 0.709571 -2.09362e-16 -0.704634
+   m_right -0.704634 8.62928e-17 -0.709571
+   m_up -2.09362e-16 -1 8.62928e-17
    m_scale 1.2 1.2 1.2
-   m_rotation 0 -0.382683 0 0.92388
-   m_worldTransform 0.848529 0 -0.848527 24.6 0 1.2 0 -4 0.848527 0 0.848529 -9.5 0 0 0 1
+   m_rotation 8.00616e-17 0.92321 8.00616e-17 -0.384295
+   m_worldTransform -0.845561 2.51234e-16 -0.851485 3.1 1.03551e-16 1.2 2.51234e-16 -4 0.851485 1.03551e-16 -0.845561 0 0 0 0 1
    m_localTransform 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 }
 class Engine::Components::ModelComponent
@@ -1324,13 +1324,13 @@ m_isActive 1
 class Engine::Components::Transform
 {
    m_parent -1
-   m_position 13.9 0.4 14.3
+   m_position -11.5 0.4 5
    m_forward -0 0.999998 0
    m_right 0.569278 0 0.822141
    m_up -0.822139 -0 0.569277
    m_scale 0.1 0.1 0.1
-   m_rotation 0.626354 0.328146 -0.328146 0.626354
-   m_worldTransform 0.056928 0.0822144 0 13.9 0 0 -0.1 0.4 -0.0822144 0.056928 0 14.3 0 0 0 1
+   m_rotation 0.626354 0.328146 -0.328145 0.626356
+   m_worldTransform 0.0569282 0.0822142 2.5034e-07 -11.5 0 3.06964e-07 -0.1 0.4 -0.0822142 0.0569282 1.75834e-07 5 0 0 0 1
    m_localTransform 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 }
 class Engine::Components::ModelComponent

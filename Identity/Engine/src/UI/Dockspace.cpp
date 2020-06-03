@@ -14,6 +14,7 @@
 #include <Scene/Scene.h>
 
 #include "Tools/Time.h"
+#include "UI/Hierarchy.h"
 
 void Engine::UI::Dockspace::CreateDockspace(Core::App& p_appRef)
 {
@@ -79,6 +80,7 @@ void Engine::UI::Dockspace::CreateMenuBar(Core::App& p_appRef)
             ImGui::MenuItem("New Scene", "Ctrl + N", nullptr);
             if (ImGui::MenuItem("Open Scene", "Ctrl + O", nullptr))
             {
+                Hierarchy::m_currentlySelected = -1;
                 UI::FileBrowser::GetInstance()->Open();
                 chooseScene = true;
             }

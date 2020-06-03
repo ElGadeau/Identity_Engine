@@ -218,7 +218,10 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
         if (ImGui::DragFloat3("Position", *pos, 0.1f, 0, 0, "%0.2f"))
             transform->needUpdate = true;
         if (ImGui::DragFloat3("Rotation", *rot, 0.1f, 0, 0, "%0.2f"))
+        {
+            transform->needUpdate = true;
             transform->needAxesUpdate = true;
+        }
         if (ImGui::DragFloat3("Scale", *scale, 0.1f, 0, 0, "%0.2f"))
             transform->needUpdate = true;
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
@@ -508,7 +511,7 @@ void Engine::UI::Hierarchy::CallInspector(int32_t p_id)
 
                 ImGui::ColorEdit3("Diffuse Light Color", *diffuse, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
                 ImGui::SetNextItemWidth(100);
-                ImGui::SliderFloat("Diffuse intensity", &lightData.diffuse.w, 0.00f, 1.0f, "%.2f");
+                ImGui::DragFloat("Diffuse intensity", &lightData.diffuse.w, 0.1f, 0.0f, 25.00f, "%.3f");
                 ImGui::Separator();
                 ImGui::ColorEdit3("Specular Light Color", *specular, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
                 ImGui::SetNextItemWidth(100);
